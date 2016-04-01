@@ -62,7 +62,7 @@ def cargaRuleta(pob):
     ac = 0.0
     for cromo in pob:
         angulo = cromo[1]*360
-        tupla = (ac,ac+angulo,cromo[0])
+        tupla = (ac,ac + angulo,cromo[0])
         ruleta.append(tupla)
         ac += angulo
     return ruleta
@@ -77,39 +77,40 @@ def buscaPadre(numero,ruleta):
 
 def crossOver(par):
     #recibe una lista que contiene el par de padres y devuelve una lista con el par de hijos
-    puntoCorte = random.randint(2,30)
+    punto_corte = random.randint(2,30)
     cromo1 = par[0]
     cromo2 = par[1]
-    prefijo1 = cromo1[:puntoCorte-1]
-    sufijo1 = cromo2[puntoCorte-1:]
-    prefijo2 = cromo1[puntoCorte-1:]
-    sufijo2 = cromo2[:puntoCorte-1]
+    prefijo1 = cromo1[:punto_corte-1]
+    sufijo1 = cromo2[punto_corte-1:]
+    prefijo2 = cromo1[punto_corte-1:]
+    sufijo2 = cromo2[:punto_corte-1]
     hijo1 = prefijo1 + sufijo1
     hijo2 = prefijo2 + sufijo2
-    nuevoPar = [hijo1,hijo2]
-    return nuevoPar
+    nuevo_par = [hijo1,hijo2]
+    return nuevo_par
 
 def mutacion(cromosoma):
-    posgen = random.randint(0,29)
-    if cromosoma[posgen] == 1:
-        cromosoma[posgen] = 0
+    pos_gen = random.randint(0,29)
+    if cromosoma[pos_gen] == 1:
+        cromosoma[pos_gen] = 0
     else:
-        cromosoma[posgen] = 1
+        cromosoma[pos_gen] = 1
     return cromosoma
 
 
 #programa principal
 
 poblacion = iniciarPoblacion()
-for k in range(0,20):
-    pobfitness = cargaFitness(poblacion)
-    ruleta = cargaRuleta(pobfitness)
+for k in range(20):
+    pob_fitness = cargaFitness(poblacion)
+    ruleta = cargaRuleta(pob_fitness)
     padres = []
     for i in range(0,10):
         #buscar los 10 padres y agregarlos a una lista de padres
         num = random.randint(1,1000) #para darle dos decimales
         seleccion = (num/1000.0)*360
-        padres.append(buscaPadre(seleccion,ruleta))
+        pa = buscaPadre(seleccion,ruleta)
+        padres.append(pa)
 
     acum = 0
     #se toman de a pares de padres para hacer crossover y asignar a la nuevo poblacion
@@ -117,21 +118,17 @@ for k in range(0,20):
     for j in range(0,5):
         par = padres[acum:acum+2]
         acum += 2
-        numeroRand = random.randint(1,100)
-        if numeroRand <= (PROB_CROSS*100):
-            nuevoPar = crossOver(par)
-            poblacion.extend(nuevoPar)
+        numero_rand = random.randint(1,100)
+        if numero_rand <= (PROB_CROSS*100):
+            nuevo_par = crossOver(par)
+            poblacion.extend(nuevo_par)
         else:
             poblacion.extend(par)
 
     for cromosoma in poblacion:
-        numeroRand2 = random.randint(1,100)
-        if numeroRand2 <= (PROB_MUT*100):
+        numero_rand2 = random.randint(1,100)
+        if numero_rand2 <= (PROB_MUT*100):
             poblacion[poblacion.index(cromosoma)] = mutacion(cromosoma)
 
+
 print(poblacion)
-
-
-
-
-
