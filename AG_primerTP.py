@@ -15,6 +15,7 @@ PROB_MUT = 0.05
 COEF = 2**30 - 1
 
 import random
+import matplotlib.pyplot as plt
 
 def iniciarPoblacion():
     """"" La poblacion constara de 10 cromosomas,
@@ -29,6 +30,15 @@ def iniciarPoblacion():
         poblacion.append(cromosoma)
     return poblacion
 
+def pasa_a_decimal(cromo):
+    # recibe una lista de binarios, retorna el valor decimal que le corresponde
+    valor_entero = 0
+    j = 0
+    for i in range(len(cromo)-1,-1,-1):
+        valor_entero += cromo[i]*2**j
+        j+=1
+    return valor_entero
+
 def cargaFitness(poblacion):
     """""esta funcion recorre la poblacion y, pasando los cromosomas a enteros,
     calcula la suma total y luego el fitness, el cromosoma sera devuelto a la
@@ -38,16 +48,10 @@ def cargaFitness(poblacion):
     suma = 0
     array = []
     for cromosoma in poblacion:
-        #bucle feo
-        valor_entero = 0
-        j = 0
-        for i in range(len(cromosoma)-1,-1,-1):
-            valor_entero += cromosoma[i]*2**j
-            j+=1
+        valor_entero = pasa_a_decimal(cromosoma)
         funcion_obj = (valor_entero/float(COEF))**2
         array.append(funcion_obj)
         suma += funcion_obj
-
     #en este bucle calculo el fitness de cada cromosoma y lo cargo a la poblacion
     for cromo in poblacion:
         fitness = array[poblacion.index(cromo)]/float(suma)
@@ -55,7 +59,7 @@ def cargaFitness(poblacion):
         poblacion[poblacion.index(cromo)] = tupla
     return poblacion
 
-def cargaRuleta(pob):
+def cargaRuleta(pob_fitness):
     """""
     para armar la ruleta hacemos una lista de tuplas que le
     corresponde a cada cromosoma con 3 valores, el inicio del arco
@@ -63,7 +67,7 @@ def cargaRuleta(pob):
     """""
     ruleta = []
     ac = 0.0
-    for cromo in pob:
+    for cromo in pob_fitness:
         angulo = cromo[1]*360
         tupla = (ac,ac + angulo,cromo[0])
         ruleta.append(tupla)
@@ -100,15 +104,35 @@ def mutacion(cromosoma):
         cromosoma[pos_gen] = 1
     return cromosoma
 
+def calcula_datos(poblacion):
+    acu=0
+    for cromo in poblacion:
+        acu += cromo
+    prom = acu/float(len(poblacion))
+    maximo = max(poblacion)
+    minimo = min(poblacion)
+    tup = (minimo, maximo, prom)
+    return tup
+
+
 
 #programa principal
 
+lista_de_datos = []
 poblacion = iniciarPoblacion()
 for k in range(20):
+    lista_dec =[]
+    for cromosoma in poblacion:
+        valor = pasa_a_decimal(cromosoma)
+        lista_dec.append(valor)
+    datos = calcula_datos(lista_dec)
+    lista_de_datos.append(datos)
+
+    print("en la poblacion: " + str(k) + " min,max,prom = " + str(datos))
     pob_fitness = cargaFitness(poblacion)
     ruleta = cargaRuleta(pob_fitness)
     padres = []
-    for i in range(0,10):
+    for i in range(10):
         #buscar los 10 padres y agregarlos a una lista de padres
         num = random.randint(1,1000) #para darle dos decimales
         seleccion = (num/1000.0)*360
@@ -118,8 +142,9 @@ for k in range(20):
     acum = 0
     #se toman de a pares de padres para hacer crossover y asignar a la nuevo poblacion
     poblacion = []
-    for j in range(0,5):
-        par = padres[acum:acum+2]
+    for j in range(5):
+        par = []
+        par.extend(padres[acum:acum+2])
         acum += 2
         numero_rand = random.randint(1,100)
         if numero_rand <= (PROB_CROSS*100):
@@ -133,5 +158,10 @@ for k in range(20):
         if numero_rand2 <= (PROB_MUT*100):
             poblacion[poblacion.index(cromosoma)] = mutacion(cromosoma)
 
-
+print("\n\n")
 print(poblacion)
+
+plt.plot(lista_de_datos)
+plt.ylabel("Verde: maximo\nAzul: minimo\nRojo: promedio")
+plt.xlabel("Poblacion")
+plt.show()
