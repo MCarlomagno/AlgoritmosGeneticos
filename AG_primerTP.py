@@ -12,6 +12,7 @@ metodo de mutacion = invertida
 """""
 PROB_CROSS = 0.75
 PROB_MUT = 0.05
+COEF = 2**30 - 1
 
 import random
 
@@ -35,6 +36,7 @@ def cargaFitness(poblacion):
     """""
     #este bucle sirve para calcular la suma de todos los cromosomas
     suma = 0
+    array = []
     for cromosoma in poblacion:
         #bucle feo
         valor_entero = 0
@@ -42,12 +44,13 @@ def cargaFitness(poblacion):
         for i in range(len(cromosoma)-1,-1,-1):
             valor_entero += cromosoma[i]*2**j
             j+=1
-        cromosoma.append(valor_entero) #asigno el entero como un ultimo elemento de la lista
-        suma += valor_entero
+        funcion_obj = (valor_entero/float(COEF))**2
+        array.append(funcion_obj)
+        suma += funcion_obj
+
     #en este bucle calculo el fitness de cada cromosoma y lo cargo a la poblacion
     for cromo in poblacion:
-        fitness = cromo[30]/float(suma)
-        cromo.pop(30)
+        fitness = array[poblacion.index(cromo)]/float(suma)
         tupla = (cromo,fitness)
         poblacion[poblacion.index(cromo)] = tupla
     return poblacion
