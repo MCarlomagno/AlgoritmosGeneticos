@@ -43,7 +43,7 @@ def pasa_a_decimal(cromo):
 
     valor_entero = 0
     j = 0
-    for i in range(len(cromo)-1, -1, -1):
+    for i in range(len(cromo) - 1, -1, -1):
         valor_entero += cromo[i] * 2 ** j
         j += 1
     return valor_entero
@@ -52,52 +52,54 @@ def pasa_a_decimal(cromo):
 def cargaFitness(poblacion):
 
     """""
-    #recibe la poblacion y duevuelve una lista
+    recibe la poblacion y duevuelve una lista
     de la forma [(cromosoma,fitness),...]
     """""
 
     suma = 0
-    array = []
+    pobla_fitness = []
+    funciones_obj = []
     for cromosoma in poblacion:
         valor_entero = pasa_a_decimal(cromosoma)
         funcion_obj = (valor_entero / float(COEF)) ** 2
-        array.append(funcion_obj)
+        funciones_obj.append(funcion_obj)
         suma += funcion_obj
 
     for cromo in poblacion:
-        fitness = array[poblacion.index(cromo)] / float(suma)
+        fitness = funciones_obj[poblacion.index(cromo)] / float(suma)
         tupla = (cromo, fitness)
-        poblacion[poblacion.index(cromo)] = tupla
-    return poblacion
+        pobla_fitness.append(tupla)
+    return pobla_fitness
 
 
 def cargaRuleta(pob_fitness):
 
     """""
-    #recibe una lista de tuplas de la forma [(cromosoma,fitness),...]
-    y retorna otra lista de tuplas con [(ang_min,ang_max,cromosoma),...]
+    recibe una lista de tuplas de la forma [(cromosoma,fitness),...]
+    y retorna otra lista de tuplas
+    con [(inicio_arco_circunf,fin_arco_circunf,cromosoma),...]
     """""
 
     ruleta = []
     ac = 0.0
     for cromo in pob_fitness:
-        angulo = cromo[1] * 360
+        angulo = cromo[1] * 360   # en cromo[1] esta el fitness de ese cromosoma
         tupla = (ac, ac + angulo, cromo[0])
         ruleta.append(tupla)
-        ac += angulo
+        ac += angulo   # se va incrementando hasta 360.0 (ruleta completa)
     return ruleta
 
 
-def buscaPadre(numero,ruleta):
+def buscaPadre(numero, ruleta):
 
     """""
     recibe un numero al azar entre 0 y 360 y devuelve
     el cromosoma que corresponde al intervalo que contiene el numero
     """""
 
-    for rang in ruleta:
-        if (numero > rang[0])and(numero <= rang[1]):
-            padre = rang[2]
+    for rango in ruleta:
+        if (numero > rango[0])and(numero <= rango[1]):  # rang[0] y [1] son inicio y fin de arco de circunf.
+            padre = rango[2]  # rang[2] contiene el cromosoma asociado al rango
             break
     return padre
 
@@ -156,7 +158,7 @@ def calcula_datos(poblacion):
 
 poblacion = iniciarPoblacion()
 lista_de_datos = []
-for k in range(500):
+for k in range(50):
     lista_dec = []
     for cromosoma in poblacion:
         valor = pasa_a_decimal(cromosoma)
@@ -169,23 +171,22 @@ for k in range(500):
 
     pob_fitness = cargaFitness(poblacion)
     ruleta = cargaRuleta(pob_fitness)
-    padres = []
 
+    padres = []
     for i in range(10):
-        #buscar los 10 padres y agregarlos a una lista de padres
-        num = random.randint(1, 1000)  # para darle dos decimales
-        seleccion = (num / 1000.0) * 360
+        num = random.randint(1, 1000)
+        seleccion = (num / 1000.0) * 360  # seleccion es un flotante de dos decimales entre 0 y 360
         pa = buscaPadre(seleccion, ruleta)
         padres.append(pa)
 
     poblacion = []
     acum = 0
-
     for j in range(5):
         par = []
         par.extend(padres[acum:acum + 2])
         acum += 2
-        numero_rand = random.randint(1, 100)
+        nuevo_par = []
+        numero_rand = float(random.randint(1, 100))
         if numero_rand <= (PROB_CROSS * 100):
             nuevo_par = crossOver(par)
             poblacion.extend(nuevo_par)
@@ -193,7 +194,7 @@ for k in range(500):
             poblacion.extend(par)
 
     for cromosoma in poblacion:
-        numero_rand2 = random.randint(0, 100)
+        numero_rand2 = float(random.randint(0, 100))
         if numero_rand2 <= (PROB_MUT * 100):
             poblacion[poblacion.index(cromosoma)] = mutacion(cromosoma)
 
@@ -202,5 +203,5 @@ print(poblacion)
 
 plt.plot(lista_de_datos)
 plt.ylabel("Verde: maximo\nAzul: minimo\nRojo: promedio")
-plt.xlabel("Poblacion")
+plt.xlabel("ciclos")
 plt.show()
