@@ -158,7 +158,7 @@ def calcula_datos(poblacion):
 
 poblacion = iniciarPoblacion()
 lista_de_datos = []
-for k in range(50):
+for k in range(100):
     lista_dec = []
     for cromosoma in poblacion:
         valor = pasa_a_decimal(cromosoma)
