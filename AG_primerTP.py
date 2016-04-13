@@ -121,6 +121,9 @@ def crossOver(par):
     hijo1 = prefijo1 + sufijo1
     hijo2 = prefijo2 + sufijo2
     nuevo_par = [hijo1, hijo2]
+    for cromo in nuevo_par:
+        cro = pasa_a_decimal(cromo) / float(COEF)
+        print("hubo crossover en: " + str(cro))
     return nuevo_par
 
 
@@ -136,6 +139,8 @@ def mutacion(cromosoma):
         cromosoma[pos_gen] = 0
     else:
         cromosoma[pos_gen] = 1
+    cro = pasa_a_decimal(cromosoma) / float(COEF)
+    print("hubo mutacion en el bit " + str(pos_gen + 1) + " en el cromosoma " +  str(cro))
     return cromosoma
 
 def calcula_datos(poblacion):
@@ -148,9 +153,9 @@ def calcula_datos(poblacion):
     acu = 0
     for cromo in poblacion:
         acu += cromo
-    prom = acu / float(len(poblacion))
-    maximo = max(poblacion)
-    minimo = min(poblacion)
+    prom = (acu / float(len(poblacion))) / float(COEF)
+    maximo = max(poblacion) / float(COEF)
+    minimo = min(poblacion) / float(COEF)
     tup = (minimo, maximo, prom)
     return tup
 
@@ -158,7 +163,7 @@ def calcula_datos(poblacion):
 
 poblacion = iniciarPoblacion()
 lista_de_datos = []
-for k in range(100):
+for k in range(20):
     lista_dec = []
     for cromosoma in poblacion:
         valor = pasa_a_decimal(cromosoma)
@@ -167,7 +172,7 @@ for k in range(100):
     datos = calcula_datos(lista_dec)
     lista_de_datos.append(datos)
 
-    print(("en la poblacion: " + str(k) + " min,max,prom = " + str(datos)))
+    print(("en la poblacion: " + str(k) + " minimo, maximo, promedio (valor_decimal/coeficiente) = " + str(datos)))
 
     pob_fitness = cargaFitness(poblacion)
     ruleta = cargaRuleta(pob_fitness)
@@ -181,6 +186,7 @@ for k in range(100):
 
     poblacion = []
     acum = 0
+    cont = 0
     for j in range(5):
         par = []
         par.extend(padres[acum:acum + 2])
@@ -190,6 +196,7 @@ for k in range(100):
         if numero_rand <= (PROB_CROSS * 100):
             nuevo_par = crossOver(par)
             poblacion.extend(nuevo_par)
+            cont += 1
         else:
             poblacion.extend(par)
 
@@ -197,9 +204,6 @@ for k in range(100):
         numero_rand2 = float(random.randint(0, 100))
         if numero_rand2 <= (PROB_MUT * 100):
             poblacion[poblacion.index(cromosoma)] = mutacion(cromosoma)
-
-print("\n\n")
-print(poblacion)
 
 plt.plot(lista_de_datos)
 plt.ylabel("Verde: maximo\nAzul: minimo\nRojo: promedio")
