@@ -13,7 +13,7 @@ metodo de mutacion = invertida
 PROB_CROSS = 0.75
 PROB_MUT = 0.05
 COEF = 2 ** 30 - 1
-CANT_ELITE = 2
+CANT_ELITE = 4
 
 import random
 import matplotlib.pyplot as plt
@@ -193,7 +193,7 @@ def elite(poblacion_fit):
 poblacion = iniciarPoblacion()
 mostrarPoblacion(poblacion)
 lista_de_datos = []
-for k in range(20):
+for k in range(100):
     lista_dec = []
     for cromosoma in poblacion:
         valor = pasa_a_decimal(cromosoma)
@@ -223,7 +223,7 @@ for k in range(20):
     poblacion.extend(padres_elites)
     acum = CANT_ELITE
     cont = 0
-    for j in range(1,5):
+    for j in range(2,5):
         par = []
         par.extend(padres[acum:acum + 2])
         acum += 2
